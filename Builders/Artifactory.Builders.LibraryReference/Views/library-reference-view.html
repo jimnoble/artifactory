@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <meta charset="utf-8" />
+
+    <meta name="apple-mobile-web-app-capable"
+          content="yes" />
+
+    <meta name="viewport"
+          content="initial-scale = 1.0" />
+
+    <title></title>
+
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"
+          rel="stylesheet"
+          type="text/css" />
+
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
+          rel="stylesheet"
+          type="text/css" />
+
+    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css"
+          rel="stylesheet"
+          type="text/css" />
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"
+            type="text/javascript"></script>
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"
+            type="text/javascript"></script>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"
+            type="text/javascript"></script>
+
+    <script src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"
+            type="text/javascript"></script>
+
+    <style type="text/css">
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+        }
+
+            *, *:before, *:after
+            {
+                box-sizing: inherit;
+            }
+
+        html
+        {
+            box-sizing: border-box;
+            font-family: 'Open Sans', 'Helvetica', 'Helvetica Neue', 'Segoe UI', 'Arial', sans-serif;
+            font-size: 13px;
+            line-height: 20px;
+            height: 100%;
+        }
+
+        body
+        {
+            height: 100%;
+        }
+
+        .header-wrapper
+        {
+            background-color: rgb(29, 84, 140);
+        }
+
+        header
+        {
+            color: #fff;
+            display: block;
+            margin: 0px auto;
+            max-width: 900px;
+            overflow: hidden;
+        }
+
+            header a
+            {
+                text-decoration: none;
+                color: #fff;
+            }
+
+            header h1
+            {
+                font-weight: normal;
+                font-size: 25px;
+                line-height: 30px;
+                padding: 10px;
+            }
+
+            header .menu-button
+            {
+                display: block;
+                float: right;
+                padding: 10px;
+                font-size: 25px;
+                padding-left: 20px;
+                padding-right: 20px;
+                line-height: 30px;
+            }
+
+        .main-wrapper
+        {
+            position: relative;
+            display: block;
+            overflow: hidden;
+            min-height: 80%;
+            background-color: #fafafa;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        main
+        {
+            position: relative;
+            background-color: #fff;
+            display: block;
+            padding: 20px;
+            margin: 0px auto;
+            max-width: 900px;
+            min-height: 500px;
+            border-radius: 10px;
+        }
+
+        h2, h3, h4, h5, h6
+        {
+            clear: both;
+            padding: 5px;
+            padding-top: 10px;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        h2
+        {
+            padding-top: 25px;
+            padding-bottom: 10px;
+            color: #046;
+            font-size: 25px;
+        }
+
+        p
+        {
+            padding: 5px;
+        }
+
+        code, .code
+        {
+            font-family: Consolas;
+            color: #468;
+        }
+
+        section
+        {
+            margin-bottom: 10px;
+        }
+
+            section.keyValues
+            {
+                border-radius: 5px;
+                overflow: hidden;
+                position: relative;
+                border: solid 1px #eee;
+                box-shadow: rgba(128, 128, 128, 0.1) 1px 2px 10px;
+            }
+
+        pre
+        {
+            display: block;
+            font-family: Consolas;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            padding: 5px;
+        }
+
+        a
+        {
+            text-decoration: none;
+            color: rgb(0, 140, 220) !important;
+        }
+
+        table
+        {
+            border-spacing: 0px 0px;
+            width: 100%;
+            /*border: solid 2px #f8f8f8;*/
+            border-radius: 10px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        thead
+        {
+            /*display: none;*/
+        }
+
+        dd
+        {
+            float: left;
+            display: block;
+            padding: 5px;
+        }
+
+        dt
+        {
+            float: left;
+            display: block;
+            padding: 5px;
+        }
+
+        th
+        {
+            text-align: left;
+            font-weight: normal;
+            padding: 5px;
+            padding-left: 10px;
+            color: #666;
+            background-color: #fafafa;
+        }
+
+        td
+        {
+            /*padding: 10px;*/
+            padding-left: 10px;
+            /*padding-right: 10px;*/
+            vertical-align: top;
+            /*border-top: solid 1px #ddd;*/
+            border-top: solid 1px #eee;
+        }
+
+        th, td
+        {
+            min-width: 50px;
+        }
+
+        tbody tr:nth-child(2n+1)
+        {
+            /*background-color: #fcfcfc;*/
+        }
+
+        .footer-wrapper
+        {
+            background-color: #eee;
+            color: #bbb;
+            height: 25%;
+        }
+
+        footer
+        {
+            margin: 0px auto;
+            max-width: 900px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .row
+        {
+            padding-left: 110px;
+            padding-right: 5px;
+            border-top: solid 1px #eee;
+            overflow: hidden;
+            position: relative;
+        }
+
+            .row:first-child
+            {
+                border-top: none;
+            }
+
+            .row label:first-child
+            {
+                display: block;
+                position: relative;
+                float: left;
+                margin-left: -110px;
+                margin-top: -0px;
+                width: 110px;
+                padding: 5px;
+                padding-left: 10px;
+                padding-right: 10px;
+                height: 100%;
+                z-index: 1;
+                color: #345;
+            }
+
+            .row:nth-child(2n+1)
+            {
+                /*background-color: #fcfcfc;*/
+            }
+
+            .row label:first-child:before
+            {
+                content: '';
+                position: absolute;
+                margin-left: -10px;
+                margin-top: -10px;
+                width: 100px;
+                height: 100000px;
+                border-right: dotted 0px #eee;
+                z-index: -1;
+                background-color: #fafafa;
+            }
+
+            .row + .row
+            {
+                /*border-top: none;*/
+            }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="header-wrapper">
+
+        <header>
+
+            <a class="menu-button" href="#">
+
+                <i class="fa fa-bars"></i>
+
+            </a>
+
+            <h1>API Documentation</h1>
+
+        </header>
+
+    </div>
+
+    <div class="main-wrapper">
+
+        <main>
+
+        </main>
+
+    </div>
+
+    <div class="footer-wrapper">
+
+        <footer>
+
+            <p>&copy; 2014 - 3014 Awesomesauce Forever</p>
+
+        </footer>
+
+    </div>
+
+    <script id="controllerTemplate" type="text/x-handlebars-template">
+
+        <section>
+
+            {{#each this}}
+
+            <h2>{{Name}}</h2>
+
+            <section>
+
+                <section class="keyValues">
+
+                    {{#if Summary}}
+
+                    <div class="row">
+
+                        <label>Summary</label>
+
+                        {{{Summary}}}
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if Remarks}}
+
+                    <div class="row">
+
+                        <label>Remarks</label>
+
+                        {{{Remarks}}}
+
+                    </div>
+
+                    {{/if}}
+
+                </section>
+
+                {{#each Actions}}
+
+                <h3>{{Name}}</h3>
+
+                <section class="keyValues">
+
+                    {{#if Summary}}
+
+                    <div class="row">
+
+                        <label>Summary</label>
+
+                        {{{Summary}}}
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if Method}}
+
+                    <div class="row">
+
+                        <label>Method</label>
+
+                        <pre><code>{{Method}}</code></pre>
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if Route}}
+
+                    <div class="row">
+
+                        <label>Route</label>
+
+                        <pre><code>{{Route}}</code></pre>
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if RouteParameters}}
+
+                    <div class="row">
+
+                        <label>Route Parameters</label>
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Key</th>
+
+                                    <th>Type</th>
+
+                                    <th>Notes</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {{#each RouteParameters}}
+
+                                <tr>
+
+                                    <td><pre><code>{{Key}}</code></pre></td>
+
+                                    <td><pre><code>{{TypeName}}</code></pre></td>
+
+                                    <td>{{{Notes}}}</td>
+
+                                </tr>
+
+                                {{/each}}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if QueryParameters}}
+
+                    <div class="row">
+
+                        <label>Query Parameters</label>
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Key</th>
+
+                                    <th>Type</th>
+
+                                    <th>Notes</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {{#each QueryParameters}}
+
+                                <tr>
+
+                                    <td><pre><code>{{Key}}</code></pre></td>
+
+                                    <td><pre><code>{{TypeName}}</code></pre></td>
+
+                                    <td>{{{Notes}}}</td>
+
+                                </tr>
+
+                                {{/each}}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if BodyParameters}}
+
+                    <div class="row">
+
+                        <label>Body Parameters</label>
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>Key</th>
+
+                                    <th>Type</th>
+
+                                    <th>Notes</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody>
+
+                                {{#each BodyParameters}}
+
+                                <tr>
+
+                                    <td><pre><code>{{Key}}</code></pre></td>
+
+                                    <td><pre><code>{{TypeName}}</code></pre></td>
+
+                                    <td>{{{Notes}}}</td>
+
+                                </tr>
+
+                                {{/each}}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if Returns}}
+
+                    <div class="row">
+
+                        <label>Returns</label>
+
+                        {{{Returns}}}
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#if Remarks}}
+
+                    <div class="row">
+
+                        <label>Remarks</label>
+
+                        {{{Remarks}}}
+
+                    </div>
+
+                    {{/if}}
+
+                    {{#each Examples}}
+
+                    <div class="row">
+
+                        <label>Example {{Label}}</label>
+
+                        <pre><code>{{{Content}}}</code></pre>
+
+                    </div>
+
+                    {{/each}}
+
+
+                </section>
+
+                {{/each}}
+
+            </section>
+
+            {{/each}}
+
+        </section>
+
+    </script>
+
+    <script type="text/javascript">
+
+        var model = /* INSERT MODEL HERE */;
+
+    </script>
+
+    <script type="text/javascript">
+
+        var source = $('#controllerTemplate').html();
+
+        var template = Handlebars.compile(source);
+
+        $('main').prepend(template(model));
+
+    </script>
+
+</body>
+
+</html>

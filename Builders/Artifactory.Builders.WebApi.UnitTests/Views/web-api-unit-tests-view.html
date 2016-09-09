@@ -1,0 +1,473 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+
+        <meta charset="utf-8" />
+
+        <meta name="apple-mobile-web-app-capable"
+              content="yes" />
+
+        <meta name="viewport"
+              content="initial-scale = 1.0" />
+
+        <title></title>
+
+        <link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800"
+              rel="stylesheet"
+              type="text/css" />
+
+        <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
+              rel="stylesheet"
+              type="text/css" />
+
+        <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css"
+              rel="stylesheet"
+              type="text/css" />
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"
+                type="text/javascript"></script>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"
+                type="text/javascript"></script>
+
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0/handlebars.min.js"
+                type="text/javascript"></script>
+
+        <script src="http://ricostacruz.com/jquery.transit/jquery.transit.min.js"
+                type="text/javascript"></script>
+
+        <style type="text/css">
+            * {
+                margin: 0px;
+                padding: 0px;
+            }
+
+                *, *:before, *:after {
+                    box-sizing: inherit;
+                }
+
+            ::-webkit-input-placeholder {
+                color: #3498db;
+            }
+
+            :-moz-placeholder /* Firefox 18- */ {
+                color: #3498db;
+            }
+
+            ::-moz-placeholder /* Firefox 19+ */ {
+                color: #3498db;
+            }
+
+            :-ms-input-placeholder {
+                color: #3498db;
+            }
+
+            html {
+                box-sizing: border-box;
+                font-family: 'Open Sans', 'Helvetica', 'Helvetica Neue', 'Segoe UI', 'Arial', sans-serif;
+                font-size: 13px;
+                line-height: 20px;
+                height: 100%;
+                color: #2c3e50;
+            }
+
+            body {
+                height: 100%;
+            }
+
+            .header-wrapper {
+                background-color: #3498db;
+                position: fixed;
+                z-index: 1000;
+                width: 100%;
+            }
+
+            header {
+                color: #fff;
+                display: block;
+                margin: 0px auto;
+                max-width: 900px;
+                overflow: hidden;
+            }
+
+                header a {
+                    text-decoration: none;
+                    color: #fff;
+                }
+
+                header h1 {
+                    font-weight: normal;
+                    font-size: 20px;
+                    line-height: 25px;
+                    padding: 10px;
+                }
+
+                    header h1 a {
+                        color: #fff !important;
+                    }
+
+                header .menu-button {
+                    display: block;
+                    float: right;
+                    padding: 10px;
+                    font-size: 20px;
+                    padding-left: 15px;
+                    padding-right: 15px;
+                    line-height: 25px;
+                }
+
+            .main-wrapper {
+                position: relative;
+                display: block;
+                overflow: hidden;
+                min-height: 80%;
+                background-color: #ecf0f1;
+                padding-top: 60px;
+                padding-bottom: 10px;
+            }
+
+            main {
+                position: relative;
+                display: block;
+                /*padding: 20px;*/
+                margin: 0px auto;
+                max-width: 900px;
+                min-height: 500px;
+                border-radius: 10px;
+            }
+
+                main h1, h2, h3, h4, h5, h6 {
+                    clear: both;
+                    padding: 5px;
+                    padding-bottom: 10px;
+                    padding-top: 10px;
+                }
+
+                    main h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+                        color: #2980b9 !important;
+                    }
+
+                    h2:before, h3:before, h4:before, h5:before, h6:before {
+                        display: block;
+                        content: " ";
+                        margin-top: -285px;
+                        height: 285px;
+                        visibility: hidden;
+                    }
+
+                main h1 {
+                    font-size: 30px;
+                    margin-bottom: 10px;
+                    margin-top: 10px;
+                }
+
+            h2 {
+                font-size: 25px;
+            }
+
+            h3 {
+                font-size: 20px;
+            }
+
+            p {
+                padding: 5px;
+            }
+
+            code, .code {
+                font-family: Consolas, monospace;
+            }
+
+            code {
+                color: #27ae60;
+            }
+
+            section {
+                margin-bottom: 10px;
+            }
+
+                section.page {
+                    background-color: #fff;
+                    padding: 10px;
+                    padding-bottom: 5px;
+                    border-radius: 10px;
+                    margin-bottom: 10px;
+                }
+
+                section.key-values {
+                    overflow: hidden;
+                    position: relative;
+                    border: solid 1px #ecf0f1;
+                    border-radius: 5px;
+                    /*box-shadow: rgba(128, 128, 128, 0.1) 1px 2px 10px;*/
+                }
+
+            pre {
+                display: block;
+                font-family: Consolas;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                padding: 5px;
+            }
+
+            a {
+                text-decoration: none;
+                color: #2980b9;
+            }
+
+                a.anchor {
+                    display: block;
+                    position: relative;
+                    top: -65px;
+                    visibility: hidden;
+                }
+
+            table {
+                border-spacing: 0px 0px;
+                width: 100%;
+                /*border: solid 2px #f8f8f8;*/
+                border-radius: 10px;
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+
+            thead {
+                /*display: none;*/
+            }
+
+            dd {
+                float: left;
+                display: block;
+                padding: 5px;
+            }
+
+            dt {
+                float: left;
+                display: block;
+                padding: 5px;
+            }
+
+            th {
+                text-align: left;
+                font-weight: normal;
+                padding: 5px;
+                padding-left: 10px;
+                background-color: #ecf0f1;
+            }
+
+            td {
+                /*padding: 10px;*/
+                padding-left: 5px;
+                /*padding-right: 10px;*/
+                vertical-align: top;
+                /*border-top: solid 1px #ddd;*/
+                border-top: solid 1px #ecf0f1;
+                padding-right: 5px;
+            }
+
+            .table-of-contents td {
+                border-top: none;
+            }
+
+            th, td {
+                min-width: 50px;
+            }
+
+            tbody tr:nth-child(2n+1) {
+                /*background-color: #fcfcfc;*/
+            }
+
+            .footer-wrapper {
+                background-color: #eee;
+                color: #bbb;
+                height: 25%;
+            }
+
+            footer {
+                margin: 0px auto;
+                max-width: 900px;
+                padding: 10px;
+                text-align: center;
+            }
+
+            .row {
+                padding-left: 110px;
+                padding-right: 5px;
+                border-top: solid 1px #ecf0f1;
+                overflow: hidden;
+                position: relative;
+            }
+
+                .row:first-child {
+                    border-top: none;
+                }
+
+                .row label:first-child {
+                    display: block;
+                    position: relative;
+                    float: left;
+                    margin-left: -110px;
+                    margin-top: -0px;
+                    width: 110px;
+                    padding: 5px;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    height: 100%;
+                    z-index: 1;
+                }
+
+                .row:nth-child(2n+1) {
+                    /*background-color: #fcfcfc;*/
+                }
+
+                .row label:first-child:before {
+                    content: '';
+                    position: absolute;
+                    margin-left: -10px;
+                    margin-top: -10px;
+                    width: 100px;
+                    height: 100000px;
+                    border-right: dotted 0px #eee;
+                    z-index: -1;
+                    background-color: #ecf0f1;
+                }
+
+                .row + .row {
+                    /*border-top: none;*/
+                }
+
+            .search-box {
+                position: relative;
+                float: right;
+                padding-top: 6px;
+            }
+
+                .search-box input[type=text] {
+                    border: none;
+                    border-radius: 1000px;
+                    background-color: #2980b9;
+                    color: #fff;
+                    padding: 5px;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                    outline: none !important;
+                    font-family: 'Open Sans', 'Helvetica', 'Helvetica Neue', 'Segoe UI', 'Arial', sans-serif;
+                    font-size: 13px;
+                    line-height: 20px;
+                }
+
+                .search-box i.fa-search {
+                    color: #3498db;
+                    position: relative;
+                    margin-right: -25px;
+                    z-index: 1000;
+                }
+
+                .search-box .clear-button {
+                    display: none;
+                    color: #fff !important;
+                    margin-left: -25px;
+                }
+        </style>
+
+    </head>
+
+    <body>
+
+        <div class="header-wrapper">
+
+            <header>
+
+                <h1>
+
+                    <a href="#contents">
+
+                        <i class="fa fa-book"></i> &nbsp;
+
+                        Web API Unit Tests
+
+                    </a>
+
+                </h1>
+
+            </header>
+
+        </div>
+
+        <div class="main-wrapper">
+
+            <main>
+
+            </main>
+
+        </div>
+
+        <div class="footer-wrapper">
+
+            <footer>
+
+                <p>&copy; 2014 - 3014 Awesomesauce Forever</p>
+
+            </footer>
+
+        </div>
+
+        <script id="contentTemplate" type="text/x-handlebars-template">
+
+    <pre>using System;
+namespace WebApi.Tests
+{
+    {{#each Controllers}}
+        [TestClass]
+        public class {{Name}}Tests
+        {
+            {{#each Actions}}
+            {{#each Results}}
+            [TestMethod]
+            [TestCategory("Unit")]
+            public void {{../Name}}_When_Then{{Kind}}{{#if ArgumentText}}_{{ArgumentText}}{{/if}}()
+            {
+            }
+
+            {{/each}}
+            {{/each}}
+            class TestContext
+            {
+                {{#each Dependencies}}
+                public readonly Mock&lt;{{Type}}&gt; {{Name}}Mock = 
+                    new Mock&lt;{{Type}}&gt;(MockBehavior.Strict);
+            
+                {{/each}}
+                public readonly {{Name}} {{Name}};
+                public TestContext()
+                {
+                    {{Name}} = new {{Name}}({{#each Dependencies}}
+                        {{Name}}Mock.Object,{{/each}});
+                }
+                // Usage verification method here
+            }
+        }
+    {{/each}}
+}
+    </pre>
+
+        </script>
+
+        <script type="text/javascript">
+
+            var model = /* INSERT MODEL HERE */;
+
+        </script>
+
+        <script type="text/javascript">
+
+                var contentTemplate = Handlebars.compile($('#contentTemplate').html());
+
+                $('main').append(contentTemplate(model));
+
+        </script>
+
+    </body>
+
+</html>
