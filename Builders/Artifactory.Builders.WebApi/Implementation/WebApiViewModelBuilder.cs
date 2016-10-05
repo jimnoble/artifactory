@@ -67,7 +67,9 @@ namespace Artifactory.Builders.WebApi.Implementation
                 }                
             }
 
-            viewModel.ReferencedTypes = BuildReferencedTypes(referencedSymbols);
+            var allSymbols = DiscoverReferences(referencedSymbols);
+
+            viewModel.ReferencedTypes = BuildReferencedTypes(allSymbols);
 
             viewModel.Controllers = viewModel.Controllers.OrderBy(c => c.Name).ToList();
 
@@ -76,13 +78,126 @@ namespace Artifactory.Builders.WebApi.Implementation
             return viewModel;
         }
 
+        static Dictionary<string, Compilation> DiscoverReferences(
+            Dictionary<string, Compilation> referencedSymbols)
+        {
+            var toCheck = new Queue<KeyValuePair<string, Compilation>>(referencedSymbols);
+
+            var allReferencedSymbols = new Dictionary<string, Compilation>(referencedSymbols);
+
+            while(toCheck.Any())
+            {
+                var referencedSymbol = toCheck.Dequeue();
+
+                var theseReferences = ResolveReferences(referencedSymbol);
+
+                foreach (var reference in theseReferences)
+                {
+                    if (!allReferencedSymbols.ContainsKey(reference.Key))
+                    {
+                        allReferencedSymbols.Add(reference.Key, reference.Value);
+
+                        toCheck.Enqueue(reference);
+                    }
+                }
+            }
+
+            return allReferencedSymbols;
+        }
+
+        static List<KeyValuePair<string, Compilation>> ResolveReferences(
+            KeyValuePair<string, Compilation> typeNameCompilation)
+        {
+            var referencedSymbols = new Dictionary<string, Compilation>();
+
+            var typeName = typeNameCompilation.Key.Replace("T:", "");
+
+            var typeSymbol = typeNameCompilation.Value.GetTypeOrSubtypeByMetadataName(typeName);
+
+            if (typeSymbol == null) return new Dictionary<string, Compilation>().ToList();
+
+            if (typeSymbol.IsGenericType)
+            {
+            }
+
+            var typeCommentsXml = typeSymbol.GetDocumentationCommentXml();
+
+            if (!string.IsNullOrWhiteSpace(typeCommentsXml))
+            {
+                var typeCommentRoot = XElement.Parse(
+                    $"<comment>{typeCommentsXml}</comment>");
+
+//                typeCommentRoot = typeCommentRoot.Element()
+
+                var typeSummary = typeCommentRoot.Name == "summary" ?
+                    typeCommentRoot :
+                    typeCommentRoot.Element("summary");
+
+                if (typeSummary != null)
+                {
+                    foreach (var cref in typeSummary.GetCrefs())
+                    {
+                        if (!referencedSymbols.ContainsKey(cref))
+                        {
+                            referencedSymbols.Add(cref, typeNameCompilation.Value);
+                        }
+                    }
+                }
+            }
+
+            var properties = GetAllProperties(typeSymbol).ToList();
+
+            foreach(var propertyNameSymbol in properties)
+            {
+                var propertyCommentXml = propertyNameSymbol.Item2.GetDocumentationCommentXml();
+
+                if (!string.IsNullOrWhiteSpace(propertyCommentXml))
+                {
+                    var propertyCommentRoot = XElement.Parse(
+                        $"<comment>{propertyCommentXml}</comment>");
+
+                    propertyCommentRoot = propertyCommentRoot.Element("member") ?? propertyCommentRoot;
+
+                    var summary = propertyCommentRoot.Name == "summary" ?
+                        propertyCommentRoot :
+                        propertyCommentRoot.Element("summary");
+
+                    if (summary != null)
+                    {
+                        foreach (var cref in summary.GetCrefs())
+                        {
+                            if (!referencedSymbols.ContainsKey(cref))
+                            {
+                                referencedSymbols.Add(cref, typeNameCompilation.Value);
+                            }
+                        }
+                    }
+                }
+
+                var type = propertyNameSymbol.Item2.Type;
+
+                if (type.TypeKind == TypeKind.Array)
+                {
+                    type = (type as IArrayTypeSymbol).ElementType;
+                }
+
+                var key = type.GetDocumentationCommentId();
+
+                if (!referencedSymbols.ContainsKey(key) &&
+                    !referencedSymbols.ContainsKey(key))
+                {
+                    referencedSymbols.Add(key, typeNameCompilation.Value);
+                }
+            }
+
+            return referencedSymbols.ToList();
+        }
+
         static List<ReferencedType> BuildReferencedTypes(Dictionary<string, Compilation> referencedSymbols)
         {
             if(!referencedSymbols.Any()) return Enumerable.Empty<ReferencedType>().ToList();
 
-            var nestedReferencedSymbols = new Dictionary<string, Compilation>();
-
-            return referencedSymbols
+            var referencedTypes = referencedSymbols
                 .Where(t => t.Key.StartsWith("T:") && !t.Key.StartsWith("T:System"))
                 .ToList()
                 .Select(typeNameCompilation =>
@@ -91,7 +206,7 @@ namespace Artifactory.Builders.WebApi.Implementation
 
                     var typeSymbol = typeNameCompilation.Value.GetTypeOrSubtypeByMetadataName(typeName);
 
-                    if(typeSymbol == null)
+                    if (typeSymbol == null)
                     {
                         return new ReferencedType
                         {
@@ -130,7 +245,9 @@ namespace Artifactory.Builders.WebApi.Implementation
                     }
 
                     var properties = GetAllProperties(typeSymbol).ToList();
-                    
+
+                    var enumFields = GetAllEnumFields(typeSymbol).ToList();
+
                     return new ReferencedType
                     {
                         DocumentationCommentId = typeNameCompilation.Key,
@@ -140,73 +257,154 @@ namespace Artifactory.Builders.WebApi.Implementation
                         Summary = typeSummaryText,
 
                         Properties = properties
-                            .Select(propertyNameSymbol =>
-                            {
-                                var propertyCommentXml = propertyNameSymbol.Item2.GetDocumentationCommentXml();
-
-                                var summaryText = "";
-
-                                if(!string.IsNullOrWhiteSpace(propertyCommentXml))
-                                {
-                                    var propertyCommentRoot = XElement.Parse(
-                                        $"<comment>{propertyCommentXml}</comment>");
-
-                                    propertyCommentRoot = propertyCommentRoot.Element("member") ?? propertyCommentRoot;
-
-                                    var summary = propertyCommentRoot.Name == "summary" ? 
-                                        propertyCommentRoot : 
-                                        propertyCommentRoot.Element("summary");
-
-                                    if (summary != null)
-                                    {
-                                        foreach (var cref in summary.GetCrefs())
-                                        {
-                                            if (!referencedSymbols.ContainsKey(cref))
-                                            {
-                                                referencedSymbols.Add(cref, typeNameCompilation.Value);
-                                            }
-                                        }
-
-                                        summaryText = summary.ToMarkup();
-                                    }
-                                }
-
-                                var type = propertyNameSymbol.Item2.Type;
-
-                                if(type.TypeKind == TypeKind.Array)
-                                {
-                                    type = (type as IArrayTypeSymbol).ElementType;
-                                }
-
-                                var key = type.GetDocumentationCommentId();
-
-                                if (!referencedSymbols.ContainsKey(key) && 
-                                    !nestedReferencedSymbols.ContainsKey(key))
-                                {
-                                    nestedReferencedSymbols.Add(key, typeNameCompilation.Value);
-                                }
-
-                                return new Property
-                                {
-                                    Alias = propertyNameSymbol.Item1 != propertyNameSymbol.Item2.Name ? 
-                                        propertyNameSymbol.Item1 : 
-                                        null,
-
-                                    Name = propertyNameSymbol.Item2.Name,
-
-                                    TypeName = type.ToTypeDisplayName(), 
-
-                                    TypeDocumentCommentId = type.GetDocumentationCommentId(),
-
-                                    Summary = summaryText
-                                };
-                            })
+                            .Select(propertyNameSymbol => BuildProperty(
+                                referencedSymbols, 
+                                typeNameCompilation, 
+                                propertyNameSymbol))
+                            .Concat(enumFields.Select(fieldNameSymbol => BuildPropertyFromEnumField(
+                                referencedSymbols,
+                                typeNameCompilation,
+                                fieldNameSymbol)))
                             .ToList()
                     };
                 })
-                .ToList()
-                .Concat(BuildReferencedTypes(nestedReferencedSymbols))
                 .ToList();
+
+            return referencedTypes;
+        }
+
+        static Property BuildProperty(
+            Dictionary<string, Compilation> referencedSymbols, 
+            KeyValuePair<string, Compilation> typeNameCompilation, 
+            Tuple<string, IPropertySymbol> propertyNameSymbol)
+        {
+            var propertyCommentXml = propertyNameSymbol.Item2.GetDocumentationCommentXml();
+
+            var summaryText = "";
+
+            if (!string.IsNullOrWhiteSpace(propertyCommentXml))
+            {
+                var propertyCommentRoot = XElement.Parse(
+                    $"<comment>{propertyCommentXml}</comment>");
+
+                propertyCommentRoot = propertyCommentRoot.Element("member") ?? propertyCommentRoot;
+
+                var summary = propertyCommentRoot.Name == "summary" ?
+                    propertyCommentRoot :
+                    propertyCommentRoot.Element("summary");
+
+                if (summary != null)
+                {
+                    foreach (var cref in summary.GetCrefs())
+                    {
+                        if (!referencedSymbols.ContainsKey(cref))
+                        {
+                            referencedSymbols.Add(cref, typeNameCompilation.Value);
+                        }
+                    }
+
+                    summaryText = summary.ToMarkup();
+                }
+            }
+
+            var type = propertyNameSymbol.Item2.Type;
+
+            if (type.TypeKind == TypeKind.Array)
+            {
+                type = (type as IArrayTypeSymbol).ElementType;
+            }
+
+            var key = type.GetDocumentationCommentId();
+
+            return new Property
+            {
+                Alias = propertyNameSymbol.Item1 != propertyNameSymbol.Item2.Name ?
+                    propertyNameSymbol.Item1 :
+                    null,
+
+                Name = propertyNameSymbol.Item2.Name,
+
+                TypeName = type.ToTypeDisplayName(),
+
+                TypeDocumentCommentId = type.GetDocumentationCommentId(),
+
+                Summary = summaryText
+            };
+        }
+
+        static Property BuildPropertyFromEnumField(
+            Dictionary<string, Compilation> referencedSymbols,
+            KeyValuePair<string, Compilation> typeNameCompilation,
+            Tuple<string, IFieldSymbol> fieldNameSymbol)
+        {
+            var propertyCommentXml = fieldNameSymbol.Item2.GetDocumentationCommentXml();
+
+            var summaryText = "";
+
+            if (!string.IsNullOrWhiteSpace(propertyCommentXml))
+            {
+                var propertyCommentRoot = XElement.Parse(
+                    $"<comment>{propertyCommentXml}</comment>");
+
+                propertyCommentRoot = propertyCommentRoot.Element("member") ?? propertyCommentRoot;
+
+                var summary = propertyCommentRoot.Name == "summary" ?
+                    propertyCommentRoot :
+                    propertyCommentRoot.Element("summary");
+
+                if (summary != null)
+                {
+                    foreach (var cref in summary.GetCrefs())
+                    {
+                        if (!referencedSymbols.ContainsKey(cref))
+                        {
+                            referencedSymbols.Add(cref, typeNameCompilation.Value);
+                        }
+                    }
+
+                    summaryText = summary.ToMarkup();
+                }
+            }
+
+            var type = fieldNameSymbol.Item2.Type;
+
+            if (type.TypeKind == TypeKind.Array)
+            {
+                type = (type as IArrayTypeSymbol).ElementType;
+            }
+
+            var key = type.GetDocumentationCommentId();
+
+            return new Property
+            {
+                Alias = fieldNameSymbol.Item2.HasConstantValue ? 
+                    fieldNameSymbol.Item2.ConstantValue.ToString() :
+                    null,
+
+                Name = fieldNameSymbol.Item2.Name,
+
+                TypeName = type.ToTypeDisplayName(),
+
+                TypeDocumentCommentId = type.GetDocumentationCommentId(),
+
+                Summary = summaryText
+            };
+        }
+
+        static IEnumerable<Tuple<string, IFieldSymbol>> GetAllEnumFields(INamedTypeSymbol typeSymbol)
+        {
+            if (typeSymbol.TypeKind == TypeKind.Enum)
+            {
+                var fields = typeSymbol
+                    .GetMembers()
+                    .Where(s => s.Kind == SymbolKind.Field)
+                    .Cast<IFieldSymbol>();
+
+                foreach (var field in fields)
+                {
+                    yield return Tuple.Create(field.Name, field);
+                }
+            }
         }
 
         static IEnumerable<Tuple<string, IPropertySymbol>> GetAllProperties(INamedTypeSymbol typeSymbol)

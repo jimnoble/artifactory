@@ -536,47 +536,51 @@
 
                     </div>
 
-                    <div class="row">
+                    {{#if ReferencedTypes.length}}
 
-                        <label>Types</label>
+                        <div class="row">
 
-                        <table>
+                            <label>Types</label>
 
-                            <thead>
+                            <table>
 
-                                <tr>
+                                <thead>
 
-                                    <th>Name</th>
+                                    <tr>
 
-                                    <th>Summary</th>
+                                        <th>Name</th>
 
-                                </tr>
+                                        <th>Summary</th>
 
-                            </thead>
+                                    </tr>
 
-                            <tbody>
+                                </thead>
 
-                                {{#each ReferencedTypes}}
+                                <tbody>
 
-                                    {{#unless NotFound}}
+                                    {{#each ReferencedTypes}}
 
-                                        <tr>
+                                        {{#unless NotFound}}
 
-                                            <td><a href="#{{DocumentationCommentId}}">{{Name}}</a></td>
+                                            <tr>
 
-                                            <td>{{{Summary}}}</td>
+                                                <td><a href="#{{DocumentationCommentId}}">{{Name}}</a></td>
 
-                                        </tr>
+                                                <td>{{{Summary}}}</td>
 
-                                    {{/unless}}
+                                            </tr>
 
-                                {{/each}}
+                                        {{/unless}}
 
-                            </tbody>
+                                    {{/each}}
 
-                        </table>
+                                </tbody>
 
-                    </div>
+                            </table>
+
+                        </div>
+
+                    {{/if}}
 
                 </section>
 
@@ -849,99 +853,103 @@
 
                 {{/each}}
 
-                <h1>Referenced Types</h1>
+                {{#if ReferencedTypes.length}}
 
-                {{#each ReferencedTypes}}
+                    <h1>Referenced Types</h1>
 
-                    {{#if NotFound}}    
+                    {{#each ReferencedTypes}}
 
-                        <!-- Missing information for {{Name}} -->
+                        {{#if NotFound}}    
 
-                    {{else}}
+                            <!-- Missing information for {{Name}} -->
 
-                        <section class="page">
+                        {{else}}
 
-                            <a id="{{{DocumentationCommentId}}}" class="anchor"></a>
+                            <section class="page">
 
-                            <h3><a href="#{{DocumentationCommentId}}">{{Name}}</a></h3>
+                                <a id="{{{DocumentationCommentId}}}" class="anchor"></a>
 
-                            {{#if NotFound}}
+                                <h3><a href="#{{DocumentationCommentId}}">{{Name}}</a></h3>
+
+                                {{#if NotFound}}
                     
-                                <p>Information for this type is not available.</p>
+                                    <p>Information for this type is not available.</p>
 
-                            {{else}}
+                                {{else}}
 
-                                <section class="key-values">
+                                    <section class="key-values">
 
-                                    {{#if Summary}}
+                                        {{#if Summary}}
+
+                                            <div class="row">
+
+                                                <label>Summary</label>
+
+                                                {{{Summary}}}
+
+                                            </div>
+
+                                        {{/if}}
 
                                         <div class="row">
 
-                                            <label>Summary</label>
+                                            <label>Properties</label>
 
-                                            {{{Summary}}}
+                                            <table>
+
+                                                <thead>
+
+                                                    <tr>
+
+                                                        <th>Name</th>
+
+                                                        <th>Type</th>
+
+                                                        <th>Summary</th>
+
+                                                    </tr>
+
+                                                </thead>
+
+                                                <tbody>
+
+                                                    {{#each Properties}}
+
+                                                    <tr>
+
+                                                        <td>
+                                                    
+                                                            <code>{{Name}}</code>
+                                                        
+                                                            {{#if Alias}} <i>as</i> <code>{{Alias}}</code>{{/if}}
+                                                    
+                                                        </td>
+
+                                                        <td><code><a href="#{{TypeDocumentCommentId}}">{{TypeName}}</a></code></td>
+
+                                                        <td>{{{Summary}}}</td>
+
+                                                    </tr>
+
+                                                    {{/each}}
+
+                                                </tbody>
+
+                                            </table>
 
                                         </div>
 
-                                    {{/if}}
+                                    </section>
 
-                                    <div class="row">
+                                {{/if}}                   
 
-                                        <label>Properties</label>
-
-                                        <table>
-
-                                            <thead>
-
-                                                <tr>
-
-                                                    <th>Name</th>
-
-                                                    <th>Type</th>
-
-                                                    <th>Summary</th>
-
-                                                </tr>
-
-                                            </thead>
-
-                                            <tbody>
-
-                                                {{#each Properties}}
-
-                                                <tr>
-
-                                                    <td>
-                                                    
-                                                        <code>{{Name}}</code>
-                                                        
-                                                        {{#if Alias}} <i>as</i> <code>{{Alias}}</code>{{/if}}
-                                                    
-                                                    </td>
-
-                                                    <td><code><a href="#{{TypeDocumentCommentId}}">{{TypeName}}</a></code></td>
-
-                                                    <td>{{{Summary}}}</td>
-
-                                                </tr>
-
-                                                {{/each}}
-
-                                            </tbody>
-
-                                        </table>
-
-                                    </div>
-
-                                </section>
-
-                            {{/if}}                   
-
-                        </section>
+                            </section>
                 
-                    {{/if}}
+                        {{/if}}
 
-                {{/each}}
+                    {{/each}}
+
+                {{/if}}
 
             </section>
 
